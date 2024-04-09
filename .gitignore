@@ -1,6 +1,8 @@
 __pycache__
 /env/
 .env
-/docs/
+/docs/*
+!/docs/transcriptor.drawio
+!/docs/tutorial.md
 /assets/*
 !/assets/.gitkeep
