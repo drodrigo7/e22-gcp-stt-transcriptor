@@ -47,42 +47,20 @@ def ftc(
 @app.command()
 def att(
     project_id: str = Option(help='GCP project ID', envvar='GCP_PROJECT_ID'),
-    src_uri: str = Option(help='Source URI of audio file.'),
-    dst_uri: str = Option(help='Destination URI for Speech-to-Text output.'),
+    bucket_name: str = Option(help='GCS bucket', envvar='GCP_BUCKET_NAME'),
+    language_code: str = Option(help='Language code for Chirp language model', envvar='GCP_LANGUAGE_CODE'),
+    src_blob: str = Option(help='Source blob of audio file.'),
+    dst_blob: str = Option(help='Destination blob for Speech-to-Text output.'),
 ) -> None:
     '''(a)udio (t)o (t)ext
     
     This command makes a request to the Speech-to-Text V2 API for a dynamic batch
     long running operation.
     '''
-    _tracking_file = './assets/tracking/requests.csv'
-    Service.dynamic_batch_transcription(project_id, src_uri, dst_uri, _tracking_file)
-    return
-
-@app.command()
-def ctl(
-    src_uri: str = Option(help='GCS URI path for blob.'),
-    folder: Optional[bool] = Option(False, help='Flag that indicates if URI is partial path (folder).')
-) -> None:
-    '''(c)loud (t)o (l)ocal
-    
-    Downloads a blob or folder from Google Cloud Storage bucket into a local directory.
-    '''
-    _saving_path = './assets/downloads/'
-    Service.gcs_to_local(src_uri, _saving_path, folder)
-    return
-
-@app.command()
-def ttt(
-    src_file: str = Option(help='Source file with results from Speech-to-Text V2 request.'),
-    dst_file: str = Option(help='Destination filename for storing the results.')
-) -> None:
-    '''(t)ranscript (t)o (t)ext
-    
-    This command takes the transcript output from the Speech-to-Text V2 API
-    and load its contents into a readable format (txt file).
-    '''
-    Service.transcript_to_text(src_file, dst_file)
+    src_uri = f'gs://{bucket_name}/{src_blob}'
+    dst_uri = f'gs://{bucket_name}/{dst_blob}'
+    tracking_file = './assets/tracking/requests.csv'
+    Service.dynamic_batch_transcription(project_id, src_uri, dst_uri, tracking_file, language_code)
     return
 
 @app.command()
@@ -97,6 +75,34 @@ def rto(
     '''
     _tracking_file = './assets/tracking/validation.csv'
     Service.retrieve_transcript(operation_name, _tracking_file)
+    return
+
+@app.command()
+def ctl(
+    bucket_name: str = Option(help='GCS bucket', envvar='GCP_BUCKET_NAME'),
+    src_blob: str = Option(help='GCS path for blob/folder.'),
+    folder: Optional[bool] = Option(False, help='Flag that indicates if `src_blob` is a GCS folder.')
+) -> None:
+    '''(c)loud (t)o (l)ocal
+    
+    Downloads a blob or folder from Google Cloud Storage bucket into a local directory.
+    '''
+    saving_path = './assets/downloads/'
+    src_uri = f'gs://{bucket_name}/{src_blob}'
+    Service.gcs_to_local(src_uri, saving_path, folder)
+    return
+
+@app.command()
+def ttt(
+    src_dir: str = Option(help='Source directory with results from Speech-to-Text V2 request.'),
+    dst_file: str = Option(help='Destination filename for storing the results.')
+) -> None:
+    '''(t)ranscript (t)o (t)ext
+    
+    This command takes the transcript output from the Speech-to-Text V2 API
+    and load its contents into a readable format (txt file).
+    '''
+    Service.transcript_to_text(src_dir, dst_file)
     return
 
 if __name__ == '__main__':

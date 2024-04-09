@@ -1,7 +1,7 @@
 # ./modules/service.py
 # ==================================================
 # standard
-import time, contextlib, pathlib, json
+import time, contextlib, pathlib, json, os
 # requirements
 from moviepy.editor import VideoFileClip
 from google.cloud import storage
@@ -66,11 +66,11 @@ class Service(object):
             blob.upload_from_filename(src_file)
         
         uri_name = 'gs://{}/{}'.format(blob.bucket.name, blob.name)
-        watcher.info('File {} uploaded to: {}.'.format(src_file, uri_name))
+        watcher.info('File {} uploaded to: {}'.format(src_file, uri_name))
         return uri_name
     
     @staticmethod
-    def dynamic_batch_transcription(project_id: str, src_uri: str, dst_uri: str, tracking_file: str) -> None:
+    def dynamic_batch_transcription(project_id: str, src_uri: str, dst_uri: str, tracking_file: str, language_code: str) -> None:
         '''Transcribes audio from a Google Cloud Storage URI
         using dynamic batching on batch recognition for long
         audios.
@@ -81,6 +81,8 @@ class Service(object):
         :type src_uri: str
         :param dst_uri: The Google Cloud Storage URI for Speech-to-Text output.
         :type dst_uri: str
+        :param language_code: Language code available for GCP's Chirp language model.
+        :type language_code: str
         
         :return: None.
         :rtype: None
@@ -94,7 +96,7 @@ class Service(object):
         
         config = RecognitionConfig(
             auto_decoding_config=AutoDetectDecodingConfig(),
-            language_codes=['es-US'],
+            language_codes=[language_code],
             model='chirp'
         )
         
@@ -114,10 +116,12 @@ class Service(object):
         
         csv_row = json.dumps({'completed': completed, 'name': operation_name})
         Utils.csv_writer(tracking_file, [csv_row])
+        watcher.info('Request metadata exported to: {}'.format(tracking_file))
         
         if completed:
             watcher.info('Operation completed: {}', operation_name)
             return
+        
         watcher.info('Operation in progress: {}', operation_name)
         return
     
@@ -169,45 +173,47 @@ class Service(object):
         filepath = '{}/{}'.format(saving_path.strip('/'), spt_uri[-1])
         stg_client = storage.Client()
         
-        if folder:
-            pathlib.Path(filepath).mkdir(parents=True, exist_ok=True)
-            splt_uri = src_uri.replace('gs://', '').split('/')
-            
-            bucket_name, folder_name = splt_uri.pop(0), '/'.join(splt_uri)
-            bucket_blobs = [b for b in stg_client.list_blobs(bucket_name, prefix=folder_name)]
-            
-            for b in bucket_blobs:
-                b.download_to_filename('{}/{}'.format(filepath, b.name.split('/')[-1]))
-            
-            watcher.info('Elements from "{}" downloaded to: {}.'.format(src_uri, filepath))
-            return filepath
-        
         with contextlib.closing(stg_client):
+            if folder:
+                pathlib.Path(filepath).mkdir(parents=True, exist_ok=True)
+                splt_uri = src_uri.replace('gs://', '').split('/')
+                
+                bucket_name, folder_name = splt_uri.pop(0), '/'.join(splt_uri)
+                bucket_blobs = [b for b in stg_client.list_blobs(bucket_name, prefix=folder_name)]
+                
+                for b in bucket_blobs:
+                    b.download_to_filename('{}/{}'.format(filepath, b.name.split('/')[-1]))
+                
+                watcher.info('Elements from "{}" downloaded to: {}'.format(src_uri, filepath))
+                return filepath
+            
             with open(filepath, 'wb') as sf:
                 _ = stg_client.download_blob_to_file(src_uri, sf)
         
-        watcher.info('File "{}" downloaded to: {}.'.format(src_uri, filepath))
+        watcher.info('File "{}" downloaded to: {}'.format(src_uri, filepath))
         return filepath
     
     @staticmethod
-    def transcript_to_text(src_file: str, dst_file: str) -> str:
+    def transcript_to_text(src_dir: str, dst_file: str) -> str:
         '''Read result from Speech-to-Text V2 request and writes a text file.
         
-        :param src_file: Source file with results from Speech-to-Text V2 request.
-        :type src_file: str
+        :param src_dir: Source directory with results from Speech-to-Text V2 request.
+        :type src_dir: str
         :param dst_file: Destination filename for storing the results.
         :type dst_file: str
         
         :return: Local path to file with Speech-to-Text V2 output.
         :rtype: str
         '''
-        jf_params = dict(file=src_file, mode='r', encoding='utf-8')
-        tf_params = dict(file=dst_file, mode='w', encoding='utf-8')
+        linewriter = lambda r: '{}\n'.format(r['alternatives'][0]['transcript'].strip())
         
-        with open(**jf_params) as jf, open(**tf_params) as tf:
-            transcript = json.load(jf)
-            linewriter = lambda r: '{}\n'.format(r['alternatives'][0]['transcript'].strip())
-            tf.writelines([linewriter(r) for r in transcript['results']])
+        with open(file=dst_file, mode='a', encoding='utf-8') as tf:
+            for f in os.listdir(src_dir):
+                jf_args = ['{}/{}'.format(src_dir.strip('/'), f), 'r']
+            
+            with open(*jf_args, encoding='utf-8') as jf:
+                transcript = json.load(jf)
+                tf.writelines([linewriter(r) for r in transcript['results']])
         
         watcher.info('Transcription text exported at: {}'.format(dst_file))
         return dst_file
