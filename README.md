@@ -72,8 +72,8 @@ For `GCP_LANGUAGE_CODE` variable, refer to codes available for GCP's Chirp model
 ### 3.3. Virtual environment
 Windows
 ```bash
-python -m venv env
-env\Scripts\activate.bat
+python -m venv .venv
+.venv\Scripts\activate.bat
 pip3 install -r requirements.txt
 ```
 
