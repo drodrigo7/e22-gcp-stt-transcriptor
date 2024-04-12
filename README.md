@@ -4,8 +4,9 @@ perform transcriptions of long audio files using Speech-to-Text V2 API
 from GCP. Read the following README.md file for configurations required.
 
 ## 1. Google Cloud
-### 1.1. GCP SDK
+*Check `./docs/transcriptor.drawio` for the diagram of GCP services interaction.*
 
+### 1.1. GCP SDK
 This script requires to install and configure the CLI for Google Cloud in 
 order to use Python client and interact with GCP services. Refer to installation documentation ([docs](https://cloud.google.com/sdk/docs/install)).
 
@@ -28,7 +29,7 @@ gcloud auth application-default login
 This resource if required for long running transcriptions.
 If no other bucket is available, the following command deploys a single bucket:
 ```bash
-gcloud storage buckets create "gs://{bucket-name}" --project="{project-id}" --location="us-central1" 
+gcloud storage buckets create "gs://{bucket-name}" --project="{project-id}" --location="us-central1"
 ```
 
 #### 1.2.4. GCP Speech-to-Text API

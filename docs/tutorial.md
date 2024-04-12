@@ -4,7 +4,10 @@ Follow this tutorial after configuration steps at [README.md](../README.md).
 
 ---
 
-## 1. Extracting audio from a video file:
+This tutorial will show instructions according to the following process:  
+<img src="./process.jpg" alt="process.jpg" style="height: 50%; width:50%;"/>
+
+## 0. Extracting audio from a video file:
 This step is optional. In case you'd like to extract a speech from a 
 video file.  
 For this tutorial, put a video file with a speech in the following path: `assets/video.mp4`. Then, execute the following command:
@@ -19,7 +22,7 @@ will be the same as the input, but with the corresponding extension.
 
 ---
 
-## 2. Uploading audio to Google Cloud Storage:
+## 1. Uploading audio to Google Cloud Storage:
 The following command will upload the local audio file to the GCS bucket from the `.env` file.
 The file `./assets/temp/video.mp4.wav` is located and renamed in the bucket as `audio/audio.wav`.
 ```bash
@@ -29,7 +32,7 @@ python src/main.py ftc --src-file="./assets/temp/video.mp4.wav" --blob-name="aud
 
 ---
 
-## 3. Request transcription:
+## 2. Request transcription:
 The following command makes a request to Speech-to-Text API V2 that takes as input the blob path from an audio file and the destination blob path where the transcription will be placed.
 Both blobs should be located at the bucket from the environment variable `GCP_STORAGE_NAME`.
 The script will indicate if the transcription operation takes less than 10 seconds, else, 
@@ -43,7 +46,7 @@ In this tutorial, the audio is short and the service completed the request in le
 
 ---
 
-## 4. Transcription operation status:
+## 3. Transcription operation status:
 For scenarios where the operation takes longer, it is possible to use the file `assets/tracking/requests.csv` to retrieve the name of pending operations. With this attribute, execute the following command to check the status.
 ```bash
 python src/main.py rto --operation-name="projects/{project-number}/locations/us-central1/operations/{operation}"
@@ -53,7 +56,7 @@ If the operation is completed, the script will save its metadata to the file `./
 
 ---
 
-## 5. Download transcription results:
+## 4. Download transcription results:
 In this step, the argument `--src-blob` takes the same value as `--dst-blob` from the step 3. The API exports the results to a folder with this name, so the flag `--folder` is required for this step to download all the contents from it.
 ```bash
 python src/main.py ctl --src-blob="text/transcript.txt" --folder
@@ -64,7 +67,7 @@ In this example, the results for the transcription will be at the local director
 
 ---
 
-## 6. Format transcription to text file:
+## 5. Format transcription to text file:
 As results are JSON files, it is required to parse these into a single text file. The following command will 
 take all files from the downloaded folder and make a single file with the relevant contents.
 ```bash

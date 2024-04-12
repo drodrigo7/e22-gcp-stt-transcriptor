@@ -4,5 +4,6 @@ __pycache__
 /docs/*
 !/docs/transcriptor.drawio
 !/docs/tutorial.md
+!/docs/process.jpg
 /assets/*
 !/assets/.gitkeep
