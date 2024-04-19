@@ -2,8 +2,7 @@ __pycache__
 /.venv
 .env
 /docs/*
-!/docs/transcriptor.drawio
 !/docs/tutorial.md
-!/docs/process.jpg
+!/docs/*.jpg
 /assets/*
 !/assets/.gitkeep

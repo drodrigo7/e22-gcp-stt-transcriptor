@@ -5,6 +5,7 @@ import dotenv
 dotenv.load_dotenv()
 # --------------------------------------------------
 # standard
+from datetime import datetime
 from typing import Optional
 # requirements
 import typer
@@ -59,7 +60,7 @@ def att(
     '''
     src_uri = f'gs://{bucket_name}/{src_blob}'
     dst_uri = f'gs://{bucket_name}/{dst_blob}'
-    tracking_file = './assets/tracking/requests.csv'
+    tracking_file = './assets/tracking/requests/{}.json'.format(datetime.now().strftime('%Y%m%d_%H%M%S'))
     Service.dynamic_batch_transcription(project_id, src_uri, dst_uri, tracking_file, language_code)
     return
 
@@ -73,8 +74,8 @@ def rto(
     Speech-to-Text V2 API.
     `operation_name` format: projects/{project-id}/locations/{region}/operations/{operation}
     '''
-    _tracking_file = './assets/tracking/validation.csv'
-    Service.retrieve_transcript(operation_name, _tracking_file)
+    tracking_file = './assets/tracking/validation/{}.json'.format(datetime.now().strftime('%Y%m%d_%H%M%S'))
+    Service.retrieve_transcript(operation_name, tracking_file)
     return
 
 @app.command()

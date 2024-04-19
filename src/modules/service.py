@@ -114,8 +114,8 @@ class Service(object):
         time.sleep(10)
         completed = long_operation.done()
         
-        csv_row = json.dumps({'completed': completed, 'name': operation_name})
-        Utils.csv_writer(tracking_file, [csv_row])
+        json_dict = {'completed': completed, 'name': operation_name}
+        Utils.json_writer(tracking_file, json_dict)
         watcher.info('Request metadata exported to: {}'.format(tracking_file))
         
         if completed:
@@ -142,13 +142,13 @@ class Service(object):
         )
         ops_response = speechv2_client.get_operation(request=GetOperationRequest(name=operation_name))
         if ops_response.done:
-            csv_row = json.dumps({
-                'completed' : ops_response.done,
-                'name'      : ops_response.name,
-                'metadata'  : json.loads(MessageToJson(ops_response.metadata)),
-                'response'  : json.loads(MessageToJson(ops_response.response))
-            })
-            Utils.csv_writer(tracking_file, [csv_row])
+            json_dict = {
+                'completed': ops_response.done,
+                'name'     : ops_response.name,
+                'metadata' : json.loads(MessageToJson(ops_response.metadata)),
+                'response' : json.loads(MessageToJson(ops_response.response))
+            }
+            Utils.json_writer(tracking_file, json_dict)
             watcher.info('Operation completed. Metadata exported to: {}'.format(tracking_file))
             return
         
@@ -205,15 +205,10 @@ class Service(object):
         :return: Local path to file with Speech-to-Text V2 output.
         :rtype: str
         '''
-        linewriter = lambda r: '{}\n'.format(r['alternatives'][0]['transcript'].strip())
-        
         with open(file=dst_file, mode='a', encoding='utf-8') as tf:
             for f in os.listdir(src_dir):
-                jf_args = ['{}/{}'.format(src_dir.strip('/'), f), 'r']
-            
-            with open(*jf_args, encoding='utf-8') as jf:
-                transcript = json.load(jf)
-                tf.writelines([linewriter(r) for r in transcript['results']])
+                with open('{}/{}'.format(src_dir.strip('/'), f), encoding='utf-8') as jf:
+                    tf.writelines(Utils.transcript_parser(json.load(jf)))
         
         watcher.info('Transcription text exported at: {}'.format(dst_file))
         return dst_file

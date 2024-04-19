@@ -4,7 +4,6 @@ perform transcriptions of long audio files using Speech-to-Text V2 API
 from GCP. Read the following README.md file for configurations required.
 
 ## 1. Google Cloud
-*Check `./docs/transcriptor.drawio` for the diagram of GCP services interaction.*
 
 ### 1.1. GCP SDK
 This script requires to install and configure the CLI for Google Cloud in 
@@ -57,7 +56,7 @@ and of type `Standard Storage`.
 ## 3. Environment Configuration
 ### 3.1. Directories
 ```bash
-mkdir -p ./assets/downloads ./assets/temp ./assets/tracking
+mkdir -p ./assets/downloads ./assets/temp ./assets/tracking/requests ./assets/tracking/validation
 ```
 
 ### 3.2. Environment variables

@@ -7,6 +7,9 @@ Follow this tutorial after configuration steps at [README.md](../README.md).
 This tutorial will show instructions according to the following process:  
 <img src="./process.jpg" alt="process.jpg" style="height: 50%; width:50%;"/>
 
+The following diagram shows interaction between GCP services:  
+<img src="./gcp.jpg" alt="gcp.jpg" style="height: 50%; width:50%;"/>
+
 ## 0. Extracting audio from a video file:
 This step is optional. In case you'd like to extract a speech from a 
 video file.  
@@ -39,10 +42,10 @@ The script will indicate if the transcription operation takes less than 10 secon
 it will show a message saying the operation is running in GCP.
 ```bash
 python src/main.py att --src-blob="audio/audio.wav" --dst-blob="text/transcript.txt"
-# YYYY-MM-DD HH:mm:ss.SSS | INFO | modules.service:dynamic_batch_transcription:119 | Request metadata exported to: ./assets/tracking/requests.csv
+# YYYY-MM-DD HH:mm:ss.SSS | INFO | modules.service:dynamic_batch_transcription:119 | Request metadata exported to: ./assets/tracking/requests/YYYYMMDD_HHmmss.json
 # YYYY-MM-DD HH:mm:ss.SSS | INFO | modules.service:dynamic_batch_transcription:122 | Operation completed: projects/{project-number}/locations/us-central1/operations/{operation}
 ```
-In this tutorial, the audio is short and the service completed the request in less than 10 seconds. Details of the operations (finished or pending) are written into a file located at `assets/tracking/requests.csv`. This file shows the state of the request and the name of the operation.
+In this tutorial, the audio is short and the service completed the request in less than 10 seconds. Details of the operations (finished or pending) are written into a file located at `assets/tracking/requests/{current-datetime}.json`. This file shows the state of the request and the name of the operation.
 
 ---
 
@@ -50,9 +53,9 @@ In this tutorial, the audio is short and the service completed the request in le
 For scenarios where the operation takes longer, it is possible to use the file `assets/tracking/requests.csv` to retrieve the name of pending operations. With this attribute, execute the following command to check the status.
 ```bash
 python src/main.py rto --operation-name="projects/{project-number}/locations/us-central1/operations/{operation}"
-# YYYY-MM-DD HH:mm:ss.SSS | INFO | modules.service:retrieve_transcript:148 | Operation completed. Metadata exported to: ./assets/tracking/validation.csv
+# YYYY-MM-DD HH:mm:ss.SSS | INFO | modules.service:retrieve_transcript:148 | Operation completed. Metadata exported to: ./assets/tracking/validation/YYYYMMDD_HHmmss.json
 ```
-If the operation is completed, the script will save its metadata to the file `./assets/tracking/validation.csv`, else, it will show a message which indicates that the operations is still in progress. As the script uses dynamic batch for transcriptions, in some cases this could take up to 24 hours for results ([docs](https://cloud.google.com/blog/products/ai-machine-learning/google-cloud-speech-to-text-v2-api)).
+If the operation is completed, the script will save its metadata to the file `./assets/tracking/validation/{current-datetime}.json`, else, it will show a message which indicates that the operations is still in progress. As the script uses dynamic batch for transcriptions, in some cases this could take up to 24 hours for results ([docs](https://cloud.google.com/blog/products/ai-machine-learning/google-cloud-speech-to-text-v2-api)).
 
 ---
 
