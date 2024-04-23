@@ -27,8 +27,8 @@ def vta(
     
     Extracts the audio from a video and saves it in a local directory as a WAV file.
     '''
-    _saving_path = './assets/temp/'
-    Service.retrieve_audio(video_path, _saving_path)
+    saving_path = './assets/temp/'
+    Service.retrieve_audio(video_path, saving_path)
     return
 
 @app.command()
