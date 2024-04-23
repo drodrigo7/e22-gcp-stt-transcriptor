@@ -25,5 +25,13 @@ class Utils(object):
     
     @staticmethod
     def transcript_parser(transcript_json: Dict[str, List[Any]]) -> List[str]:
+        '''Extracts transcription results into a collection.
+        
+        :param transcript_json: Dictionary with contents of transcription operation results.
+        :type transcript_json: Dict[str, List[Any]]
+        
+        :return: List containing transcription blocks.
+        :rtype: List[str]
+        '''
         ftd_results = [r for r in transcript_json['results'] if 'alternatives' in r.keys()]
         return ['{}\n'.format(f['alternatives'][0]['transcript'].strip()) for f in ftd_results]

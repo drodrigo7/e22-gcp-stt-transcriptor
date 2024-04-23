@@ -1,8 +1,7 @@
 # ./main.py
 # ==================================================
 # settings
-import dotenv
-dotenv.load_dotenv()
+import dotenv; dotenv.load_dotenv()
 # --------------------------------------------------
 # standard
 from datetime import datetime
@@ -42,7 +41,7 @@ def ftc(
     
     Uploads a local file to a bucket in Google Cloud Storage.
     '''
-    Service.file_to_gcs(bucket_name, src_file, blob_name)
+    Service.file_to_gcs(bucket_name, src_file, blob_name.strip('/'))
     return
 
 @app.command()
@@ -58,8 +57,8 @@ def att(
     This command makes a request to the Speech-to-Text V2 API for a dynamic batch
     long running operation.
     '''
-    src_uri = f'gs://{bucket_name}/{src_blob}'
-    dst_uri = f'gs://{bucket_name}/{dst_blob}'
+    src_uri = f'gs://{bucket_name}/{src_blob.strip('/')}'
+    dst_uri = f'gs://{bucket_name}/{dst_blob.strip('/')}'
     tracking_file = './assets/tracking/requests/{}.json'.format(datetime.now().strftime('%Y%m%d_%H%M%S'))
     Service.dynamic_batch_transcription(project_id, src_uri, dst_uri, tracking_file, language_code)
     return
@@ -89,7 +88,7 @@ def ctl(
     Downloads a blob or folder from Google Cloud Storage bucket into a local directory.
     '''
     saving_path = './assets/downloads/'
-    src_uri = f'gs://{bucket_name}/{src_blob}'
+    src_uri = f'gs://{bucket_name}/{src_blob.strip('/')}'
     Service.gcs_to_local(src_uri, saving_path, folder)
     return
 

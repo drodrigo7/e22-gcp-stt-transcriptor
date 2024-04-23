@@ -35,7 +35,7 @@ gcloud storage buckets create "gs://{bucket-name}" --project="{project-id}" --lo
 This service needs to be enabled in the GCP project.
 Refer to GCP console for enabling the service ([console](https://console.cloud.google.com/apis/api/speech.googleapis.com/overview)) or execute the following command:
 ```bash
-gcloud services enable speech.googleapis.com
+gcloud services enable speech.googleapis.com storage.googleapis.com
 ```
 
 ---
@@ -79,8 +79,8 @@ pip3 install -r requirements.txt
 
 Linux
 ```bash
-python -m venv env
-source env/bin/activate
+python -m venv .venv
+source .venv/bin/activate
 pip3 install -r requirements.txt
 ```
 
