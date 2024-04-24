@@ -113,3 +113,4 @@ Refer to the file [tutorial.md](./docs/tutorial.md) for a transcription example.
 * GCP Speech-to-Text Python client: https://cloud.google.com/python/docs/reference/speech/latest/google.cloud.speech_v2.services.speech.SpeechClient
 * GCP Speech-to-Text API recognizers: https://cloud.google.com/speech-to-text/v2/docs/reference/rest/v2/projects.locations.recognizers/batchRecognize
 * Language support for Speech-to-Text V2 API: https://cloud.google.com/speech-to-text/v2/docs/speech-to-text-supported-languages
+* API Quotas: https://cloud.google.com/speech-to-text/v2/quotas
