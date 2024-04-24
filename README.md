@@ -24,18 +24,18 @@ User local credentials for Python client (no JSON keys):
 gcloud auth application-default login
 ```
 
-#### 1.2.3. Storage Bucket
+#### 1.2.3. GCP Speech-to-Text API
+This service needs to be enabled in the GCP project, as well as Cloud Storage. 
+Refer to GCP console for enabling both services or execute the following command:
+```bash
+gcloud services enable speech.googleapis.com storage.googleapis.com
+```
+
+#### 1.2.4. Storage Bucket
 This resource if required for long running transcriptions.
 If no other bucket is available, the following command deploys a single bucket:
 ```bash
 gcloud storage buckets create "gs://{bucket-name}" --project="{project-id}" --location="us-central1"
-```
-
-#### 1.2.4. GCP Speech-to-Text API
-This service needs to be enabled in the GCP project.
-Refer to GCP console for enabling the service ([console](https://console.cloud.google.com/apis/api/speech.googleapis.com/overview)) or execute the following command:
-```bash
-gcloud services enable speech.googleapis.com storage.googleapis.com
 ```
 
 ---
